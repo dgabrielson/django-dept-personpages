@@ -1,0 +1,9 @@
+
+{% url "person-page-list" as app_top_url %}
+{% if app_top_url %}
+    {% if app_top_url != request.path %}
+        <a href="{{ app_top_url }}">People</a>
+    {% else %}
+        People
+    {% endif %}
+{% endif %}

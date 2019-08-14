@@ -1,0 +1,24 @@
+{% extends 'person_pages/__base.html' %}
+
+{# ########################################### #}
+
+{% block page_title %}List of Personal Pages{% endblock %}
+{% block title %}List of Personal Pages{% endblock %}
+
+{# ########################################### #}
+
+{% block content %}
+
+{% if page_list %}
+    <ul>
+    {% for page in page_list %}
+        <li><a href="{{ page.get_absolute_url }}">{{ page }}</a>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+
+{% endblock content %}
+
+
+{# ########################################### #}

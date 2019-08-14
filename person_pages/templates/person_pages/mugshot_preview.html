@@ -1,0 +1,79 @@
+{% extends 'person_pages/personpage_detail.html' %}
+{% load static %}
+{% load person_pages_tags %}
+{% load directory_tags %}
+{% load face_detect_tags %}
+
+{# ########################################### #}
+
+{% block page_title %}{{ page }} - Mugshot Preview{% endblock %}
+{% block title %}{{ page }}: Mugshot Preview{% endblock %}
+
+{# ########################################### #}
+
+{% block page_breadcrumbs %}
+    {{ block.super }}
+    <span class="divider">&gt;</span>
+    Mugshot Preview
+{% endblock page_breadcrumbs %}
+
+
+{# ########################################### #}
+
+{% block content %}
+
+
+
+
+{% with page.pageinfo.photo as photo %}
+
+{% face_detect_preview_img photo 'preview' %}
+
+<ul class="pagenav">
+    {% if perms.person_pages.change_personpage or request.user.username == page.person.username %}
+        {% if preview %}
+            <li>
+                <a href="{% url 'person-page-mugshot-save' slug=page.person.slug %}">
+                    Save
+                </a>
+            </li>
+        {% endif %}
+    {% endif %}
+
+    <li>
+        <a href="{{ page.get_absolute_url }}">
+            Cancel
+        </a>
+    </li>
+</ul>
+
+{% if perms.person_pages.change_personpage or request.user.username == page.person.username %}
+    {% if not preview %}
+        <ul  style="list-style-image:url({% static 'admin/img/icon-no.svg' %})">
+            <li>
+                There was a problem detecting a mugshot in this photo.
+            </li>
+        </ul>
+    {% endif %}
+{% endif %}
+
+
+<div class="person">
+    {% if photo %}
+        {# <img src="{% url 'person-page-mugshot-preview-img' slug=page.person.slug %}" height="{{ photo.height }}" width="{{ photo.width }}" alt="Preview of {{ page.person }} mugshot" /> #}
+            {% if preview %}
+                <img style="display:block; margin:auto;" src="data:{{ preview.mimetype }};base64,{{ preview.base64 }}"height="{{ photo.height }}" width="{{ photo.width }}" alt="Preview of {{ page.person }} mugshot" />
+            {% else %}
+                <img style="display:block; margin:auto;" src="{{ photo.url }}" height="{{ photo.height }}" width="{{ photo.width }}" alt="Photo of {{ page.person }}" />
+            {% endif %}
+    {% endif %}
+
+</div>
+
+{% endwith %}
+
+
+{% endblock %}
+
+
+{# ########################################### #}

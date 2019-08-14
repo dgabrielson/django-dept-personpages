@@ -1,0 +1,79 @@
+{% comment %}
+    Basic inline tabular formset layout.
+    See static/js/jquery.formset.js
+    https://github.com/elo80ka/django-dynamic-formset
+{% endcomment %}{% load static %}
+<table id="{{ formset.prefix }}-formset" class="table-form formset">
+    {{ formset.management_form }}
+    {% if not formset.is_valid and formset.non_form_errors%}
+        <tr class="form-errors">
+            <td colspan="2">
+                <ul class=errorlist>
+                {% for error in formset.non_form_errors %}
+                    <li>
+                        {{ error }}
+                    </li>
+                {% endfor %}
+                </ul>
+            </td>
+        </tr>
+    {% endif %}
+    {% for form in formset %}
+        {% with form_tbody_id=form.prefix|add:"-row" %}
+            {% include 'includes/form.html' with visual_break=True form_tbody_class="formset-form-container" %}
+        {% endwith %}
+    {% endfor %}
+    {% with form=formset.empty_form form_tbody_id=formset.prefix|add:"-template" %}
+        {% include 'includes/form.html' with visual_break=True form_tbody_style="display:none;" form_tbody_class="formset-form-container" %}
+    {% endwith %}
+</table>
+
+<script type="text/javascript">
+    $(function() {
+        $('#{{ formset.prefix }}-formset tbody.formset-form-container').formset({
+            prefix: '{{ formset.prefix }}',
+            addText: '<img src="{% static "img/icons/plus.svg" %}" style="width:0.75em; vertical-align: bottom;"> Add another {{ itemname }}',
+            deleteText: '<img src="{% static "img/icons/trashcan.svg" %}" style="width:0.75em; vertical-align: bottom;"> Delete this {{ itemname }}',
+            formTemplate: '#{{ formset.prefix }}-template',
+            canDelete: {{ formset.can_delete|lower }},
+            deleteCssClass: 'delete-row left'
+        });
+    });
+</script>
+{% comment %}
+OPTIONS:
+
+``prefix``
+    Use this to specify the prefix for your formset if it's anything
+    other than the default ("form"). This option must be supplied for
+    inline formsets.
+
+``addText``
+    Use this to set the text for the generated add link. The default
+    text is "add another".
+
+``deleteText``
+    Use this to set the text for the generated delete links. The
+    default text is "remove".
+
+``addCssClass``
+    Use this to change the default CSS class applied to the generated
+    add link (possibly, to avoid CSS conflicts within your templates).
+    The default class is "add-row".
+
+``deleteCssClass``
+    Use this to change the default CSS class applied to the generated
+    delete links. The default class is "delete-row".
+
+``added``
+    If you set this to a function, that function will be called each
+    time a new form is added. The function should take a single argument,
+    ``row``; it will be passed a jQuery object, wrapping the form that
+    was just added.
+
+``removed``
+    Set this to a function, and that function will be called each time
+    a form is deleted. The function should take a single argument,
+    ``row``; it will be passed a jQuery object, wrapping the form that
+    was just removed.
+{% endcomment %}

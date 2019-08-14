@@ -1,0 +1,4 @@
+include requirements.txt
+include LICENSE.txt
+#recursive-include person_pages/static *
+recursive-include person_pages/templates *

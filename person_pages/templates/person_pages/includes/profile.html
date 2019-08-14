@@ -1,0 +1,49 @@
+{# ########################################################## #}
+{# This template fragment expects to be have a `third_person` #}
+{# variable as a part of the context.                         #}
+{# This variable indicates whether it is *this* person        #}
+{# or a different person looking at the information           #}
+{# It is assumed that only people with the change_person      #}
+{# permission will be looking at other people's information.  #}
+{# ########################################################## #}
+
+{% load humanize %}
+
+
+{% if person.personpage %}
+    <h3>Personal page</h3>
+    <p>
+        {% if third_person %}
+            This person has
+        {% else %}
+            You have
+        {% endif %}
+        a personal page.
+        {% if person.personpage.active %}
+            (It is active.)
+        {% else %}
+            (Currently not active.)
+        {% endif %}
+    </p>
+    <p>
+        {% if person.personpage.active %}
+            <a href="{{ person.personpage.get_absolute_url }}">
+                &rarr; Go to page
+            </a>
+        {% endif %}
+    </p>
+    {% if not third_person %}
+        {% url 'person-page-calendar' slug=person.slug  as link_url %}
+        {% if link_url %}
+            <strong>Personal calendar feed:</strong>
+            <div class="copy-link">
+                <input id="personal-calendar-url" value="{{ request.scheme }}://{{ request.get_host }}{{ link_url }}" readonly type="text">
+                <span title="Copy to clipboard">
+                    <button data-clipboard-target="#personal-calendar-url" class="copy-link-btn" ></button>
+                </span>
+            </div>
+            <small>Use the button to copy the url; paste this into your calendar
+            program as a subscription.</small>
+        {% endif %}
+    {% endif %}
+{% endif %}

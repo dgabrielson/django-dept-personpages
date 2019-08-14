@@ -1,0 +1,65 @@
+{% extends 'person_pages/personpage_detail.html' %}
+
+{# ######################################### #}
+
+{% block html_head %}
+{{ block.super }}
+{{ form.media }}
+{{ info_formset.media }}
+{% endblock %}
+
+{# ######################################### #}
+
+{# right sidebar should be empty in twocol mode #}
+{% block page_right_sidebar %}{% endblock %}
+{% block page_main_classes %}col-lg-10{% endblock %}
+
+{# ######################################### #}
+
+{% block page_title %}Update Page for {{ page }}{% endblock %}
+{% block title %}Update Page for {{ page }}{% endblock %}
+
+{# ########################################### #}
+
+{% block page_breadcrumbs %}
+    {{ block.super }}
+    <span class="divider">&gt;</span>
+    Update
+{% endblock page_breadcrumbs %}
+
+{# ########################################### #}
+
+{% block content %}
+
+{% include 'person_pages/includes/personpage_form_extras.html' %}
+
+<form enctype="multipart/form-data" action="" method="post" class="form">{% csrf_token %}
+    <div class="form-container">
+        <table class="table-form">
+            <tr class="submit-row">
+                <td>
+                    <input type="submit" value="Update" class="save-btn">
+                </td>
+            </tr>
+        </table>
+        <table class="table-form">
+            {% include 'includes/form.html' %}
+        </table>
+        {% include 'person_pages/includes/inline_stacked_formset.html' with formset=formset_list.0 %}
+        {% include 'person_pages/includes/inline_stacked_formset.html' with formset=formset_list.1 itemname='section' %}
+        {% include 'person_pages/includes/inline_tabular_formset.html' with formset=formset_list.2 itemname='file' %}
+        <table class="table-form">
+            <tr class="submit-row">
+                <td>
+                    <input type="submit" value="Update" class="save-btn">
+                </td>
+            </tr>
+        </table>
+    </div>
+</form>
+
+
+{% endblock %}
+
+
+{# ########################################### #}

@@ -1,0 +1,205 @@
+{% extends 'person_pages/__base.html' %}
+{% load person_pages_tags %}
+{% load directory_tags %}
+
+{# ########################################### #}
+
+{% block page_title %}{{ page }}{% endblock %}
+{% block title %}{{ page }}{% endblock %}
+
+{# ########################################### #}
+
+{% block page_breadcrumbs %}
+    <span class="divider">&gt;</span>
+    {% with object_url=page.get_absolute_url %}
+        {% if object_url != request.path %}
+            <a href="{{ object_url }}">{{ page }}</a>
+        {% else %}
+            {{ page }}
+        {% endif %}
+    {% endwith %}
+{% endblock page_breadcrumbs %}
+
+{# ########################################### #}
+
+{% block content %}
+
+{% if perms.person_pages.change_personpage or page.allow_owner_edits and request.user.username == page.person.username %}
+    <ul class="pagenav">
+        <li>
+            <a href="{% url 'person-page-update' page.person.slug %}">Update page</a>
+        </li>
+    </ul>
+{% endif %}
+
+
+<div class="person">
+{% with page.pageinfo.photo as photo %}
+    {% if photo %}
+        <center>
+            <img src="{{ photo.url }}" height="{{ photo.height }}" width="{{ photo.width }}" alt="Photo of {{ page.person }}" />
+        </center>
+    {% endif %}
+{% endwith %}
+
+{% with page.person as person %}
+    {######### person's title #########}
+    {% if person.title %}
+        <h2>{{ person.title }}</h2>
+    {% else %}
+        {% if person.directoryentry_set.all.0.title %}
+            <h2>{{ person.directoryentry_set.all.0.title }}</h2>
+        {% else %}
+            {% if person.type.public.0 %}
+                <h2>{{ person.type.public.0 }}</h2>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
+    <table class="contact-info">
+        {######### contact info - digital #########}
+
+        {% if person.email %}
+            <tr class="email">
+                <th style="text-align:right"><strong>Email</strong></th>
+                <td>{{ person.email|cloak_email_link }}</td>
+            </tr>
+        {% endif %}
+
+
+        {######### contact info - meatspace #########}
+        {% for entry in person.directoryentry_set.active %}
+            {% ifchanged %}
+                {% if entry.office %}
+                    <tr class="where">
+                        <th style="text-align:right"><strong>
+                            {% if entry.description %}
+                                {{ entry.description }}
+                            {% else %}
+                                Office
+                            {% endif %}
+                            </strong>
+                        </th>
+                        <td>
+                            {{ entry.office }}
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endifchanged %}
+            {% ifchanged %}
+                <tr class="phone">
+                    <th style="text-align:right"></th>
+                    <td>
+                        {% if entry.phone_number %}
+                            {{ entry.phone_number }}
+                        {% elif person.phone %}
+                            {{ person.phone }}
+                        {% elif entry.office.phone_number %}
+                            {{ entry.office.phone_number }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endifchanged %}
+        {% empty %}
+            {% if person.phone %}
+                <tr class="phone">
+                    <th style="text-align:right">Phone</th>
+                    <td>{{ person.phone }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+
+    {######### contact info - directory entry notes #########}
+    {% for direntry in person.directoryentry_set.default_list %}
+        {% if direntry.note %}
+            <p class="side-note">({{ direntry.note }})</p>
+        {% endif %}
+    {% endfor %}
+
+
+    {######### introduction #########}
+    {% if page.pageinfo.introduction %}
+        <p id="introduction">
+            {{ page.pageinfo.introduction|prerender|restructuredtext }}
+        </p>
+    {% endif %}
+
+
+    {######### research interests #########}
+    {% with person.persontaggedentry_set.active as research_list %}
+        {% if research_list %}
+            <div class="research">
+                <p class="interests">
+                    <h2>Research Interests</h2>
+                    {% for entry in research_list %}
+                        {# <a href="{{ entry.tag.get_absolute_url }}">{{ entry }}</a>{% if not forloop.last %}, {% endif %} #}
+                        {% if entry.tag.groups %}
+                            <a href="{{ entry.tag.get_absolute_url }}">
+                                {{ entry }}</a>{% if not forloop.last %}, {% endif %}
+                        {% else %}
+                            {{ entry }}{% if not forloop.last %}, {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </p>
+            </div>
+        {% endif %}
+    {% endwith %}
+
+
+    {######### publications #########}
+    {% with person.publication_set.recent as publication_list %}
+        {% if person.publication_set.recent %}
+            <h2>Recent Publications</h2>
+            <ul class="publicationlist">
+                {% for pub in publication_list %}
+                    <li> {{ pub.as_html }}
+                {% endfor %}
+            </ul>
+            {% if person.publication_set.active.count > 5 %}
+                <p>
+                    <a href="{% url 'publications-personal-list' person.slug %}">
+                        &rarr; See more publications
+                    </a>
+                </p>
+            {% endif %}
+        {% endif %}
+    {% endwith %}
+
+{% endwith %}
+
+{% for section in page.pagesection_set.active %}
+    <h2>{{ section }}</h2>
+
+    {{ section.content|prerender|restructuredtext }}
+{% endfor %}
+
+
+</div>
+
+
+{% with pagefile_list=page.pagefile_set.public %}
+    {% if pagefile_list %}
+        <div class="personal_links">
+            <ul>
+                {% for pagefile in pagefile_list %}
+                    <li>
+                        <a href="{{ pagefile.get_absolute_url }}">
+                            {% if pagefile.description %}
+                                {{ pagefile.description }}
+                            {% else %}
+                                {{ pagefile.slug }}
+                            {% endif %}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endwith %}
+
+
+{% endblock %}
+
+
+{# ########################################### #}

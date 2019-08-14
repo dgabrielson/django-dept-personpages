@@ -1,0 +1,29 @@
+{% extends 'person_pages/mugshot_preview.html' %}
+{% load person_pages_tags %}
+{% load directory_tags %}
+
+{# ########################################### #}
+
+{% block page_title %}{{ page }} - Mugshot Save Error{% endblock %}
+{% block title %}{{ page }}: Mugshot Save Error{% endblock %}
+
+{# ########################################### #}
+
+{% block content %}
+{{ block.super }}
+
+{% comment %}{# not needed due to messages #}
+{% if error %}
+    <p>
+        <strong>
+            Error:
+        </strong>
+        {{ error }}
+    </p>
+{% endif %}
+{% endcomment %}
+
+{% endblock %}
+
+
+{# ########################################### #}

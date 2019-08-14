@@ -1,0 +1,6 @@
+docutils
+pillow
+
+django-dept-directory
+django-webcal
+django-markuphelpers

@@ -1,0 +1,18 @@
+{% load person_pages_tags %}
+{{ object }}
+
+{{ object.pageinfo.introduction|prerender }}
+
+{% with object.person.persontaggedentry_set.active as research_list %}
+{% if research_list %}Research Interests:
+{% for entry in research_list %}{{ entry }}{% if not forloop.last %}, {% endif %}
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+{% for section in object.pagesection_set.active %}
+{{ section }}
+
+{{ section.content|prerender }}
+
+{% endfor %}
